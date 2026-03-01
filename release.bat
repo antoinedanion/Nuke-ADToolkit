@@ -57,10 +57,24 @@ for /d /r "%ADTOOLKIT_DIR%" %%d in (__pycache__) do (
 
 :: ------------------------------------------------------------
 :: Create zip (requires PowerShell 5+)
+:: includes ADToolkit/, LICENSE, CHANGELOG, README.md
 :: ------------------------------------------------------------
 echo Creating %ZIP_PATH%...
+
+set PATHS_TO_ZIP=
+
+:: Build list of items to include
+set ITEMS=
+if exist "%ADTOOLKIT_DIR%"       set ITEMS=%ITEMS%'%ADTOOLKIT_DIR%',
+if exist "%REPO_DIR%LICENSE"     set ITEMS=%ITEMS%'%REPO_DIR%LICENSE',
+if exist "%REPO_DIR%CHANGELOG"   set ITEMS=%ITEMS%'%REPO_DIR%CHANGELOG',
+if exist "%REPO_DIR%README.md"   set ITEMS=%ITEMS%'%REPO_DIR%README.md',
+
+:: Remove trailing comma
+set ITEMS=%ITEMS:~0,-1%
+
 powershell -NoProfile -Command ^
-    "Compress-Archive -Path '%ADTOOLKIT_DIR%' -DestinationPath '%ZIP_PATH%' -CompressionLevel Optimal"
+    "Compress-Archive -Path %ITEMS% -DestinationPath '%ZIP_PATH%' -CompressionLevel Optimal"
 
 if errorlevel 1 (
     echo ERROR: Failed to create zip.
