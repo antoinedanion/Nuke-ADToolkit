@@ -1,0 +1,5 @@
+# ADCopyParameters — Changelog
+
+## [1.0.0]
+- Initial release.
+- Alt+click on any knob copies its value to the matching knob on all other selected nodes.

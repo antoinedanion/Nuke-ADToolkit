@@ -1,0 +1,10 @@
+# ADCopyPaste — Changelog
+
+## [1.0.1]
+- Fixed reconnection edge cases on paste.
+
+## [1.0.0]
+- Initial release.
+- Copy and paste nodes while preserving their input connections, even when upstream nodes are not selected.
+- Clone detection to avoid reconnection conflicts.
+- Compatible with Nuke Indie and Non-Commercial via TCL-based workarounds.

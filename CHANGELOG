@@ -1,0 +1,18 @@
+# ADToolkit — Changelog
+
+Detailed changelogs for each plugin are in their respective `CHANGELOG` files.
+
+---
+
+## [1.0.0] — 2026-03-01
+
+- Initial release.
+
+### Sub-plugin versions
+
+| Plugin | Version | Changelog |
+|---|---|---|
+| ADCopyParameters | 1.0.0 | [CHANGELOG](ADToolkit/plugins/ADCopyParameters/CHANGELOG) |
+| ADCopyPaste | 1.0.1 | [CHANGELOG](ADToolkit/plugins/ADCopyPaste/CHANGELOG) |
+| ADFixErrors | 2.1.1 | [CHANGELOG](ADToolkit/plugins/ADFixErrors/CHANGELOG) |
+| ADNodes (ADMattepaint) | 1.1.2 | [CHANGELOG](ADToolkit/plugins/ADNodes/CHANGELOG) |

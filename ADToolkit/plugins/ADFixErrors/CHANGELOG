@@ -1,0 +1,48 @@
+# ADFixErrors — Changelog
+
+> v1.0 – v1.14 by Magno Borgo. v1.15 and later by Antoine Danion.
+
+## [2.1.1] — 2026-02-25
+- Added a clean logger for better output in the console and easier debugging.
+
+## [2.1.0] — 2025-09-15
+- Optimized the search by stopping early when all files have been found.
+- Fixed the search traversing system folders such as `RECYCLE.BIN`.
+- Result messages now show at most 30 nodes followed by "and more…" to avoid overwhelming output.
+- Improved console output to surface relevant information more clearly.
+
+## [2.0.0] — 2025-09-14
+- Added a selective search panel allowing users to include or exclude specific node types from the scan.
+- Added progress bars throughout long-running operations with cancellation support.
+- Extracted font fixing into its own dedicated `fix_fonts_errors()` function.
+- Bypassed Nuke Non-Commercial 10-node memory limitation using TCL.
+- Major refactor for readability and maintainability.
+
+## [1.16] — 2025-09-14
+- Refactored for improved readability and maintainability.
+- Switched from `fnmatch` to `re` for more precise frame pattern matching (fixes incorrect matches with `%0Xd` patterns).
+
+## [1.15] — 2025-09-12
+- Improved handling of file extensions with fewer or more than 3 characters (fixes `.cube` file issues).
+
+## [1.14] — 2014-04-01
+_(Magno Borgo)_
+- Fixed a font path issue that halted the script on Nuke v8.
+- Fixed handling of multiple Read nodes sharing the same file reference.
+
+## [1.13] — 2013-07-25
+_(Magno Borgo)_
+- Reverted check order to avoid prompting for a search directory when no errors are present.
+
+## [1.12] — 2013-02-07
+_(Magno Borgo)_
+- Added `vfield_file` to the searched knob types.
+- Automatic fix for incorrect font paths on Text nodes.
+
+## [1.0] — 2012-11-23
+_(Magno Borgo)_
+- Initial release.
+- Searches all nodes with a `file` property.
+- Single `os.walk` pass for faster searches.
+- Generalized `%0d` frame pattern handling.
+- Progress task with cancellation support.

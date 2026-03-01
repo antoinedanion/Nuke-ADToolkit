@@ -1,0 +1,180 @@
+Gizmo {
+ name ADMattepaint
+ help "Easy bridge between Nuke and Photoshop for mattepainting tasks"
+ onCreate "import nuke\nimport admattepaint_core\nadmattepaint_core.on_create(nuke.thisNode())"
+ knobChanged "import nuke\nimport admattepaint_core\nadmattepaint_core.knob_changed(nuke.thisNode(), nuke.thisKnob())"
+ tile_color 0xffffffff
+ label "(frame \[value refFrame])\n"
+
+
+ addUserKnob {20 psTab l ADMattepaint}
+
+ addUserKnob {3 refFrame l "Reference Frame"}
+ refFrame 1
+ addUserKnob {22 SET_TO_CURRENT_FRAME l "Set to Current Frame" -STARTLINE T "
+import nuke
+import admattepaint_core
+admattepaint_core.set_to_current_frame(nuke.thisNode())
+"}
+
+
+ addUserKnob {26 __1 l "" T " " +STARTLINE}
+ addUserKnob {26 _1 l "<b>Mattepaint<b>" +STARTLINE}
+ addUserKnob {1 mattepaint_name l Name}
+ mattepaint_name ""
+ addUserKnob {3 mattepaint_version l Version}
+ mattepaint_version 1
+ addUserKnob {22 mattepaint_version_increment l "+" -STARTLINE T "
+import nuke
+import admattepaint_core
+admattepaint_core.increment_mattepaint_version(nuke.thisNode())
+"}
+ addUserKnob {22 mattepaint_version_decrement l "-" -STARTLINE T "
+import nuke
+import admattepaint_core
+admattepaint_core.decrement_mattepaint_version(nuke.thisNode())
+"}
+ addUserKnob {22 goToMattepaintDir l "Go to Mattepaint Dir" t "Open the current mattepaint directory in file explorer." T "
+import nuke
+import admattepaint_core
+admattepaint_core.go_to_current_mattepaint_dir(nuke.thisNode())
+" +STARTLINE}
+
+ addUserKnob {26 __2 l "" T " " +STARTLINE}
+ addUserKnob {26 _2 l "<b>Source Image<b>"}
+ addUserKnob {4 out_image_datatype l "Data Type" M {"8 bit" "16 bit" "32 bit"}}
+ out_image_datatype "16 bit"
+ addUserKnob {41 out_image_compression l "" T Writetiff.compression -STARTLINE}
+ addUserKnob {41 out_colorspace l "Colorspace" T OCIOColorSpace1.out_colorspace}
+
+ addUserKnob {26 __3 l "" T " " +STARTLINE}
+ addUserKnob {26 _3 l "<b>Photoshop<b>" +STARTLINE}
+ addUserKnob {4 ps_version l "Photoshop Executable" M {"Auto" "From Preferences" "Custom"}}
+ addUserKnob {2 custom_photoshop_path l "Custom executable" t "Specify a custom photoshop .app or .exe path for this node only (not saved in preferences)" +HIDDEN}
+ addUserKnob {22 openPhotoshop l "Open In Photoshop" t "Opens Photoshop." T "
+import nuke
+import admattepaint_core
+admattepaint_core.open_in_photoshop(nuke.thisNode())
+" +STARTLINE}
+ addUserKnob {22 getFromPhotoshop l "Get from Photoshop" t "Export from Photoshop and load in Nuke." T "
+import nuke
+import admattepaint_core
+admattepaint_core.get_from_photoshop(nuke.thisNode())
+" -STARTLINE}
+ addUserKnob {22 getFromExports l "Get specific export" t "Get specific export version and load in Nuke." T "
+import nuke
+import admattepaint_core
+admattepaint_core.get_from_exports(nuke.thisNode())
+" -STARTLINE}
+ addUserKnob {22 createLinkedRead l "Create Linked Read" t "Create a Read node dynamically linked to the latest export." T "
+import nuke
+import admattepaint_core
+admattepaint_core.create_linked_read_node(nuke.thisNode())
+" +STARTLINE}
+
+ addUserKnob {26 __4 l "" T " " +STARTLINE}
+ addUserKnob {26 _4 l "<b>AI<b>" +STARTLINE}
+ addUserKnob {22 exportToAI l "Export source image to AI" t "Export source image to the 'toai' directory." T "
+import nuke
+import admattepaint_core
+admattepaint_core.export_to_ai(nuke.thisNode())
+" +STARTLINE}
+
+ 
+ addUserKnob {20 prefs l Preferences}
+ addUserKnob {2 preferred_photoshop_path l "Preferred Photoshop Path" t "Specify your custom photoshop .app or .exe path to be saved in preferences"}
+ addUserKnob {2 mattepaint_dir l "Mattepaint Directory"}
+ mattepaint_dir "[file dirname [value root.name]]/mattepaint"
+ addUserKnob {43 mattepaint_subdirectories l "Mattepaint Subdirectories"}
+ mattepaint_subdirectories ""
+
+ addUserKnob {26 ""}
+ addUserKnob {22 loadprefs l "Load Preferences" T "
+import nuke
+import admattepaint_core
+admattepaint_core.load_prefs(nuke.thisNode())
+"}
+ addUserKnob {22 saveprefs l "Save Preferences" -STARTLINE T "
+import nuke
+import admattepaint_core
+admattepaint_core.save_prefs(nuke.thisNode())
+"}
+ addUserKnob {22 resetprefs l "Reset Preferences" -STARTLINE T "
+import nuke
+import admattepaint_core
+admattepaint_core.reset_prefs(nuke.thisNode())
+"}
+
+
+ addUserKnob {20 info l Info}
+ addUserKnob {26 infos l "" +STARTLINE T "
+ <span style=\"color:#aaa;font-family:sans-serif;font-size:8pt\">
+ ADMattepaint
+ <br>
+ <br>
+ Version : 1.1.2
+ <br>
+ <br>
+ Author : Antoine Danion<br>
+ </span>
+ "}
+
+  addUserKnob {20 mp_metadata_tab l "Mattepaint Metadata"}
+  addUserKnob {1 latest_export_path l "Latest Export Path" +DISABLED}
+}
+ Input {
+  inputs 0
+  name Source
+  xpos 0
+  ypos -600
+ }
+ FrameHold {
+  first_frame {{parent.refFrame}}
+  name FrameHold1
+  xpos 0
+  ypos -500
+ }
+ OCIOColorSpace {
+  channels all
+  in_colorspace scene_linear
+  out_colorspace color_picking
+  knobChanged "import nuke\nimport admattepaint_core\nadmattepaint_core.set_colorspace(nuke.thisNode().parent())"
+  name OCIOColorSpace1
+  xpos 0
+  ypos -300
+ }
+ Remove {
+  operation keep
+  channels rgb
+  name Remove1
+  xpos 0
+  ypos -200
+ }
+ set N4 [stack 0]
+ Write {
+  name Writetiff
+  file ""
+  colorspace linear
+  file_type tiff
+  datatype "16 bit"
+  compression none
+  create_directories true
+  checkHashOnRead false
+  beforeRender "import nuke\nimport admattepaint_core\nadmattepaint_core.pre_render_tiff(nuke.thisNode())"
+  xpos 0
+  ypos -100
+ }
+ push $N4
+ Write {
+  name Writepng
+  file ""
+  colorspace linear
+  file_type png
+  datatype "16 bit"
+  create_directories true
+  checkHashOnRead false
+  beforeRender "import nuke\nimport admattepaint_core\nadmattepaint_core.pre_render_png(nuke.thisNode())"
+  xpos 200
+  ypos -100
+ }
+end_group
