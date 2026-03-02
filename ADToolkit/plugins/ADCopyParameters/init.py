@@ -3,6 +3,6 @@ import nuke
 nuke.pluginAddPath('./gizmos')
 nuke.pluginAddPath('./python')
 
-from ad_copy_parameters import copy_parameters
+from ad_copy_parameters import knob_changed
 
-nuke.addKnobChanged(copy_parameters)
+nuke.addKnobChanged(knob_changed)

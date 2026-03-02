@@ -1,5 +1,10 @@
 # ADCopyParameters - Changelog
 
+## [1.0.2] - 2026-03-02
+- Fix the addon not registering shortcut since changes in 1.0.1
+- Now using a custom QEvent filter for tracking the LMB with a 0.5 seconds buffer
+- Improved knob file type handling
+
 ## [1.0.1] - 2026-03-02
 - Fix the addon activating on random alt shortcuts.
 
