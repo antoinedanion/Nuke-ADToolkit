@@ -1,5 +1,8 @@
-# ADCopyParameters — Changelog
+# ADCopyParameters - Changelog
 
-## [1.0.0]
+## [1.0.1] - 2026-03-02
+- Fix the addon activating on random alt shortcuts.
+
+## [1.0.0] - 2026-03-01
 - Initial release.
 - Alt+click on any knob copies its value to the matching knob on all other selected nodes.

@@ -1,12 +1,12 @@
 """
 ADCopyParameters Core Module
 
-Version 1.0.0
+Version 1.0.1
 
-Copyright (c) 2026 Antoine Danion
-MIT License — see LICENSE in this plugin's folder
+Antoine Danion
 """
 
+import ctypes
 import logging
 import sys
 
@@ -57,7 +57,10 @@ def copy_parameters():
     RETURN = False
 
     modifiers = QApplication.keyboardModifiers()
-    if modifiers & Qt.AltModifier:
+    mouse_buttons = QApplication.mouseButtons()
+    lmb = bool(mouse_buttons & Qt.LeftButton)
+    enter = bool(ctypes.windll.user32.GetAsyncKeyState(0x0D) & 0x8000)
+    if modifiers & Qt.AltModifier and (lmb or enter):
         node = nuke.thisNode()
         knob = nuke.thisKnob()
         if not node or not knob:
