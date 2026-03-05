@@ -1,7 +1,7 @@
 """
 ADCopyPaste Core Module
 
-Version 1.0.1
+Version 1.0.2
 
 Copyright (c) 2026 Antoine Danion
 MIT License — see LICENSE in this plugin's folder
