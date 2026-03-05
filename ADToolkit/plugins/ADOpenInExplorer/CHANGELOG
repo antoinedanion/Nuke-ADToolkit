@@ -1,0 +1,6 @@
+# ADOpenInExplorer - Changelog
+
+## [1.0.0]
+- Initial release.
+- Ctrl+E on any node opens Windows Explorer at the path in the node's 'file' knob.
+- Falls back to the parent directory when the path contains frame tokens or the file does not exist yet.
