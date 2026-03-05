@@ -57,28 +57,31 @@ for /d /r "%ADTOOLKIT_DIR%" %%d in (__pycache__) do (
 
 :: ------------------------------------------------------------
 :: Create zip (requires PowerShell 5+)
-:: includes ADToolkit/, LICENSE, CHANGELOG, README.md
+:: stages ADToolkit/ as ADToolkit_v{VERSION}/ then zips it
 :: ------------------------------------------------------------
 echo Creating %ZIP_PATH%...
 
-set PATHS_TO_ZIP=
+set STAGING_DIR=%RELEASES_DIR%\%RELEASE_NAME%_staging
+set STAGING_ADTOOLKIT=%STAGING_DIR%\ADToolkit
 
-:: Build list of items to include
-set ITEMS=
-if exist "%ADTOOLKIT_DIR%"       set ITEMS=%ITEMS%'%ADTOOLKIT_DIR%',
-if exist "%REPO_DIR%LICENSE"     set ITEMS=%ITEMS%'%REPO_DIR%LICENSE',
-if exist "%REPO_DIR%CHANGELOG"   set ITEMS=%ITEMS%'%REPO_DIR%CHANGELOG',
-if exist "%REPO_DIR%README.md"   set ITEMS=%ITEMS%'%REPO_DIR%README.md',
-
-:: Remove trailing comma
-set ITEMS=%ITEMS:~0,-1%
+:: Build staging folder: STAGING/ADToolkit/ so the zip root is ADToolkit/
+echo Staging into %STAGING_ADTOOLKIT%...
+xcopy /e /i /q "%ADTOOLKIT_DIR%" "%STAGING_ADTOOLKIT%" >nul
+if exist "%REPO_DIR%CHANGELOG"  copy /y "%REPO_DIR%CHANGELOG"  "%STAGING_ADTOOLKIT%\CHANGELOG"  >nul
+if exist "%REPO_DIR%LICENSE"    copy /y "%REPO_DIR%LICENSE"    "%STAGING_ADTOOLKIT%\LICENSE"    >nul
+if exist "%REPO_DIR%README.md"  copy /y "%REPO_DIR%README.md"  "%STAGING_ADTOOLKIT%\README.md"  >nul
 
 powershell -NoProfile -Command ^
-    "Compress-Archive -Path %ITEMS% -DestinationPath '%ZIP_PATH%' -CompressionLevel Optimal"
+    "Compress-Archive -Path '%STAGING_ADTOOLKIT%' -DestinationPath '%ZIP_PATH%' -CompressionLevel Optimal"
 
 if errorlevel 1 (
     echo ERROR: Failed to create zip.
+    rd /s /q "%STAGING_DIR%"
     exit /b 1
 )
+
+:: Remove staging folder
+echo Cleaning up staging folder...
+rd /s /q "%STAGING_DIR%"
 
 echo Done: %ZIP_PATH%
