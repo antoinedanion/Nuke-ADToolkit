@@ -1,7 +1,7 @@
 '''
 ADFixErrors Core Module
 
-Version 2.1.1
+Version 2.1.2
 
 Original work Copyright (c) 2012 Magno Borgo — BSD 3-Clause License
 Modifications Copyright (c) 2026 Antoine Danion — MIT License
@@ -23,6 +23,8 @@ See LICENSE in this plugin's folder for full license terms.
 
 #===============================================================================
 # Version Log
+#
+# Please refer to the CHANGELOG.md file in this plugin's folder for newer versions
 #
 # v2.1.1 (2026/02/25)
 # Added a clean logger for better output in the console and easier debugging

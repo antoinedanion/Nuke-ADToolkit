@@ -2,6 +2,9 @@
 
 > v1.0 – v1.14 by Magno Borgo. v1.15 and later by Antoine Danion.
 
+## [2.1.2] - 2026-03-04
+- Refactored to follow ADToolkit's conventions
+
 ## [2.1.1] - 2026-02-25
 - Added a clean logger for better output in the console and easier debugging.
 
