@@ -17,10 +17,22 @@ All sub-plugins are loaded automatically by the toolkit.
 
 # Plugins
 
+- [ADCloneGroup](#adclonegroup)
 - [ADCopyParameters](#adcopyparameters)
 - [ADCopyPaste](#adcopypaste)
 - [ADFixErrors](#adfixxerrors)
 - [ADNodes](#adnodes)
+- [ADOpenInExplorer](#adopeninexplorer)
+
+
+
+## ADCloneGroup
+
+Creates a linked clone of a Group node. All clones share the same internal node graph — editing any clone automatically propagates changes to all others. Falls back to standard Nuke clone behaviour for non-Group nodes.
+
+### Menu
+
+`ADToolkit > Clone Group (linked)` — shortcut `Alt+K`
 
 
 
@@ -40,12 +52,13 @@ Copies a knob value from one node to all other selected nodes by holding `Alt` a
 
 An enhanced copy/paste for Nuke that preserves node input connections, even when the upstream nodes are not part of the selection.
 
-### Shortcuts
+### Menu
 
-| Action | Shortcut |
+`ADToolkit > Copy Paste`
+
+| Command | Shortcut |
 |---|---|
-| Copy | `Ctrl+C` |
-| Paste | `Ctrl+V` |
+| Copy with inputs | `Ctrl+C` |
 | Paste with inputs | `Ctrl+Shift+V` |
 
 
@@ -55,7 +68,7 @@ Finds and fixes broken file paths and font errors across an entire Nuke script. 
 
 ### Menu
 
-`Fix Errors` menu in the Nuke menu bar.
+`ADToolkit > Fix Errors`
 
 | Command | Description |
 |---|---|
@@ -71,12 +84,22 @@ A collection of custom Nuke gizmos and nodes.
 
 ### ADMattepaint
 
-Shortcut: `Alt+M`
+`Nodes > ADToolkit > ADMattepaint` — shortcut `Alt+M`
 
 A self-contained mattepaint workflow node that manages the full round-trip between Nuke and Photoshop.
 
 
 
+
+
+
+## ADOpenInExplorer
+
+Opens Windows Explorer at the folder of the selected node's `file` knob. Works with any node that has a `file` knob (Read, Write, ReadGeo, etc.). Falls back to the parent directory when the path contains frame tokens or the file does not yet exist.
+
+### Menu
+
+`ADToolkit > Open in Explorer` — shortcut `Ctrl+E`
 
 
 
