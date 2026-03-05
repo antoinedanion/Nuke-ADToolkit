@@ -145,13 +145,14 @@ admattepaint_core.reset_prefs(nuke.thisNode())
  }
  Remove {
   operation keep
-  channels rgb
+  channels rgba
   name Remove1
   xpos 0
   ypos -200
  }
  set N4 [stack 0]
  Write {
+  channels rgba
   name Writetiff
   file ""
   colorspace linear
@@ -166,6 +167,7 @@ admattepaint_core.reset_prefs(nuke.thisNode())
  }
  push $N4
  Write {
+  channels rgba
   name Writepng
   file ""
   colorspace linear

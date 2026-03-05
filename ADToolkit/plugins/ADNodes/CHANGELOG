@@ -2,5 +2,9 @@
 
 ## ADMattepaint
 
+### [1.1.3]
+- Fix the node not exporting alpha channel
+- Refactored for following ADToolkit's guidelines
+
 ### [1.1.2]
 - Initial release.
