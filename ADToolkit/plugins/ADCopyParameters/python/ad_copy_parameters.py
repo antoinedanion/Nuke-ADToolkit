@@ -37,7 +37,7 @@ logger.setLevel(logging.DEBUG)
 # Only add handler if it doesn't exist (prevents duplicate logs on script reload)
 if not logger.handlers:
     handler = _DynamicStdoutHandler()
-    handler.setLevel(logging.DEBUG)
+    handler.setLevel(logging.INFO)
     formatter = logging.Formatter('[%(name)s] %(levelname)s: %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
