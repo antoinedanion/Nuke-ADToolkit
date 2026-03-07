@@ -38,22 +38,13 @@ Creates a linked clone of a Group node. All clones share the same internal node 
 
 ## ADCopyParameters
 
-Copies a knob value from one node to all other selected nodes.
+Copies a knob value from one node to all other selected nodes by holding `Alt` and clicking the knob.
 
 ### How to
-
-**Method 1 — Alt+Click**
 
 1. Select all target nodes in the node graph.
 2. Hold `Alt` and click any knob on a node.
 3. The knob value is propagated to the matching knob on every other selected node.
-
-**Method 2 — Context menu**
-
-1. Select all target nodes in the node graph.
-2. Right-click any animatable knob on a node. (like float, integers, some checkboxes, etc...)
-3. Choose `Copy to Selected`.
-4. The knob value is propagated to the matching knob on every other selected node.
 
 
 
