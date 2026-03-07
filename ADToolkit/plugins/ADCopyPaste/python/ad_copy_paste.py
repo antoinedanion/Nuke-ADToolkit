@@ -1,7 +1,7 @@
 """
 ADCopyPaste Core Module
 
-Version 1.0.2
+Version 1.0.3
 
 Copyright (c) 2026 Antoine Danion
 MIT License — see LICENSE in this plugin's folder
@@ -86,12 +86,12 @@ def copy():
         node_name = nuke.tcl(f'knob {node_id}.name')
         try:
             knobs_result = nuke.tcl(f'knobs {node_id}')
-            if not knobs_result or 'orig_id' not in knobs_result.split():
+            if not knobs_result or '_adcopypaste_orig_id' not in knobs_result.split():
                 # Create hidden string knob if it doesn't exist
-                nuke.tcl(f'addUserKnob node {node_id} 20 temp_copy_data l "INVISIBLE"')
-                nuke.tcl(f'addUserKnob node {node_id} 1 orig_id')
+                nuke.tcl(f'addUserKnob node {node_id} 20 _adcopypaste_temp_copy_data l "INVISIBLE"')
+                nuke.tcl(f'addUserKnob node {node_id} 1 _adcopypaste_orig_id')
 
-            nuke.tcl(f'knob {node_id}.orig_id {node_id}')
+            nuke.tcl(f'knob {node_id}._adcopypaste_orig_id {node_id}')
             
             logger.debug(f"Stored original ID for node {node_name} ({node_id})")
 
@@ -100,7 +100,7 @@ def copy():
             continue
     
     # for node_id in nodes_ids:
-    #     print(f'orig_id of {nuke.tcl(f"knob {node_id}.name")} is {nuke.tcl(f"value {node_id}.orig_id")}')
+    #     print(f'_adcopypaste_orig_id of {nuke.tcl(f"knob {node_id}.name")} is {nuke.tcl(f"value {node_id}._adcopypaste_orig_id")}')
     
     # Gather input and output node connections for each selected node
     nodes_dependencies = {}
@@ -224,8 +224,8 @@ def paste():
         try:
             # Get the original ID from the hidden knob
             knobs_result = nuke.tcl(f'knobs {node_id}')
-            if knobs_result and 'orig_id' in knobs_result.split():
-                orig_id = nuke.tcl(f'value {node_id}.orig_id')
+            if knobs_result and '_adcopypaste_orig_id' in knobs_result.split():
+                orig_id = nuke.tcl(f'value {node_id}._adcopypaste_orig_id')
                 if orig_id in nodes_outputs:
                     output_connections = nodes_outputs[orig_id]
                     for connection in output_connections:
@@ -253,8 +253,8 @@ def paste():
         try:
             # Get the original ID from the hidden knob
             knobs_result = nuke.tcl(f'knobs {node_id}')
-            if knobs_result and 'orig_id' in knobs_result.split():
-                orig_id = nuke.tcl(f'value {node_id}.orig_id')
+            if knobs_result and '_adcopypaste_orig_id' in knobs_result.split():
+                orig_id = nuke.tcl(f'value {node_id}._adcopypaste_orig_id')
                 if orig_id in nodes_dependencies:
                     dependencies = nodes_dependencies[orig_id]
                     # print(f'Dependencies for pasted node {node_name} ({node_id}) from original {orig_id}: {[nuke.tcl(f"knob {dep_id}.name") for dep_id in dependencies]}')
@@ -283,8 +283,8 @@ def paste():
         try:
             # Get the original ID from the hidden knob
             knobs_result = nuke.tcl(f'knobs {node_id}')
-            if knobs_result and 'orig_id' in knobs_result.split():
-                orig_id = nuke.tcl(f'value {node_id}.orig_id')
+            if knobs_result and '_adcopypaste_orig_id' in knobs_result.split():
+                orig_id = nuke.tcl(f'value {node_id}._adcopypaste_orig_id')
                 orig_name = nuke.tcl(f'knob {orig_id}.name')
                 if orig_id in nodes_outputs:
                     output_connections = nodes_outputs[orig_id]
