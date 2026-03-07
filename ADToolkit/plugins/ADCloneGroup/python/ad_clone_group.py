@@ -1,7 +1,7 @@
 """
 ADCloneGroup Core Module
 
-Version 1.0.0
+Version 1.0.1
 
 Copyright (c) 2026 Antoine Danion
 MIT License - see LICENSE in this plugin's folder
@@ -11,10 +11,10 @@ MIT License - see LICENSE in this plugin's folder
 
 # When Alt+K is pressed on a Group node, creates an independent copy of the group
 # (preserving its internal node graph) and marks it as a clone by storing the
-# source group name in a hidden knob '_ad_clone_source'.
+# source group name in a hidden knob '_adclonegroup_clone_source'.
 
 # A global nuke.addKnobChanged callback (sync_knob_changed) watches all knob
-# changes. When the changed node has the '_ad_source_name' hidden knob it is
+# changes. When the changed node has the '_adclonegroup_source_name' hidden knob it is
 # a registered source; the callback propagates the value to all clones and
 # tracks renames.
 
@@ -56,13 +56,13 @@ if not logger.handlers:
 # ============================================================================
 
 # Hidden knob on the clone - stores the source group's name
-_SOURCE_KNOB = '_ad_clone_source'
+_SOURCE_KNOB = '_adclonegroup_clone_source'
 
 # Hidden knob on the source - stores its own current name for rename tracking
-_SOURCE_REGISTERED_NAME = '_ad_source_name'
+_SOURCE_REGISTERED_NAME = '_adclonegroup_source_name'
 
 # Hidden knob on the source - space-separated list of all clone names
-_CLONE_LIST_KNOB = '_ad_clone_list'
+_CLONE_LIST_KNOB = '_adclonegroup_clone_list'
 
 # Sentinel to avoid re-injecting scripts
 _SENTINEL = '# [ADCloneGroup]'
@@ -94,9 +94,9 @@ _GROUP_SKIP_KNOBS = frozenset({
     'show_group_view',
     'group_view_position',
     'disable_group_view',
-	'_ad_clone_source',
-	'_ad_source_name',
-    '_ad_clone_list',
+	'_adclonegroup_clone_source',
+	'_adclonegroup_source_name',
+    '_adclonegroup_clone_list',
 })
 
 
@@ -135,12 +135,12 @@ try:
                 _root_prefix  = 'parent.' * _depth
                 _fam = ''
                 try:
-                    _fam = nuke.tcl('value ' + _group_prefix + '_ad_clone_source')
+                    _fam = nuke.tcl('value ' + _group_prefix + '_adclonegroup_clone_source')
                 except Exception:
                     pass
                 if not _fam:
                     try:
-                        _src = nuke.tcl('value ' + _group_prefix + '_ad_source_name')
+                        _src = nuke.tcl('value ' + _group_prefix + '_adclonegroup_source_name')
                         if _src:
                             _fam = _gname
                     except Exception:
@@ -165,7 +165,7 @@ try:
                                 _v = _k.value()
                                 _vs = _v if isinstance(_v, str) else str(_v)
                             try:
-                                _cl = nuke.tcl('value ' + _root_prefix + _fam + '._ad_clone_list')
+                                _cl = nuke.tcl('value ' + _root_prefix + _fam + '._adclonegroup_clone_list')
                             except Exception:
                                 _cl = ''
                             # Self-register: if this group is a clone but not in the
@@ -173,7 +173,7 @@ try:
                             if _fam != _gname and _gname not in _cl.split():
                                 _cl_new = (_cl.strip() + ' ' + _gname).strip()
                                 try:
-                                    nuke.tcl('knob ' + _root_prefix + _fam + '._ad_clone_list {{' + _cl_new + '}}')
+                                    nuke.tcl('knob ' + _root_prefix + _fam + '._adclonegroup_clone_list {{' + _cl_new + '}}')
                                     _cl = _cl_new
                                 except Exception as _re:
                                     print('[ADCG-sync] self-register FAIL: %r' % _re)
@@ -210,8 +210,8 @@ try:
     if _k and _n:
         _kn = _k.name()
         _skip = {_GROUP_SKIP_KNOBS}
-        _src_knob = _n.knob('_ad_source_name')
-        _cln_knob = _n.knob('_ad_clone_source')
+        _src_knob = _n.knob('_adclonegroup_source_name')
+        _cln_knob = _n.knob('_adclonegroup_clone_source')
         if _cln_knob and _cln_knob.value():
             _src_knob = None
         if not (_src_knob or _cln_knob):
@@ -227,9 +227,9 @@ try:
                     # parent = root for a group-level knobChanged
                     for _rh in nuke.tcl('nodes parent').split():
                         try:
-                            _cv = nuke.tcl('value ' + _rh + '._ad_clone_source')
+                            _cv = nuke.tcl('value ' + _rh + '._adclonegroup_clone_source')
                             if _cv == _old:
-                                nuke.tcl('knob ' + _rh + '._ad_clone_source {{' + _new + '}}')
+                                nuke.tcl('knob ' + _rh + '._adclonegroup_clone_source {{' + _new + '}}')
                         except Exception:
                             pass
                     _src_knob.setValue(_new)
@@ -257,7 +257,7 @@ try:
                                 _vs = _v if isinstance(_v, str) else str(_v)
                             # parent = root level for group knobChanged
                             try:
-                                _cl = nuke.tcl('value parent.' + _fam + '._ad_clone_list')
+                                _cl = nuke.tcl('value parent.' + _fam + '._adclonegroup_clone_list')
                             except Exception:
                                 _cl = ''
                             # Self-register: if this node is a clone but not in the
@@ -265,7 +265,7 @@ try:
                             if _cln_knob and _nn not in _cl.split():
                                 _cl_new = (_cl.strip() + ' ' + _nn).strip()
                                 try:
-                                    nuke.tcl('knob parent.' + _fam + '._ad_clone_list {{' + _cl_new + '}}')
+                                    nuke.tcl('knob parent.' + _fam + '._adclonegroup_clone_list {{' + _cl_new + '}}')
                                     _cl = _cl_new
                                 except Exception as _re:
                                     print('[ADCG-group] self-register FAIL: %r' % _re)
@@ -297,7 +297,7 @@ except Exception as _top_e:
 def clone_group():
     """
     Clone the selected Group by copying its internal graph and tagging the copy
-    with '_ad_clone_source'. The global sync_knob_changed callback then handles
+    with '_adclonegroup_clone_source'. The global sync_knob_changed callback then handles
     value propagation and rename tracking.
     Falls back to standard nuke.clone() for non-Group nodes.
     """
