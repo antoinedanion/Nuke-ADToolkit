@@ -1,7 +1,7 @@
 """
 ADCopyParameters Core Module
 
-Version 1.0.2
+Version 1.1.0
 
 Antoine Danion
 """
@@ -118,7 +118,52 @@ IGNORED_KNOBS = [
 # on the target node while Alt is still held, which would start a reverse copy.
 _copying = False
 
-def copy_parameters():
+
+def _is_knob_copyable(knob, check_animated=False):
+    """Return True if the knob is eligible to be copied, False otherwise."""
+    if knob.name() in IGNORED_KNOBS:
+        logger.debug(f"Ignoring knob '{knob.name()}' as it's in the ignored list.")
+        return False
+    # File_Knob on Read nodes reports isAnimated() == True because the filename
+    # pattern (e.g. file.%04d.exr) is frame-dependent, so we exempt File_Knob.
+    if check_animated and hasattr(knob, 'isAnimated') and knob.isAnimated():
+        if not isinstance(knob, nuke.File_Knob):
+            logger.debug(f"Ignoring knob '{knob.name()}' as it is animated.")
+            return False
+    if hasattr(knob, 'isReadOnly') and knob.isReadOnly():
+        logger.debug(f"Ignoring knob '{knob.name()}' as it is read-only.")
+        return False
+    return True
+
+
+def _apply_knob_to_selected(source_node, knob, value):
+    """Copy value to the same knob on all other selected nodes. Returns number of successful copies."""
+    node_ids = nuke.tcl('selected_nodes').split()
+    copied_count = 0
+    for node_id in node_ids:
+        node_name = nuke.tcl(f'knob {node_id}.name')
+        if node_name == source_node.name():
+            continue
+
+        try:
+            float(value)
+            is_numeric = True
+        except Exception:
+            is_numeric = False
+
+        try:
+            if is_numeric:
+                nuke.tcl(f'knob {node_id}.{knob.name()} {value}')
+            else:
+                nuke.tcl(f'knob {node_id}.{knob.name()} "{value}"')
+            logger.info(f"Copied value '{value}' of knob '{knob.name()}' from node '{source_node.name()}' to node '{node_name}'")
+            copied_count += 1
+        except Exception as e:
+            logger.warning(f"Could not copy value '{value}' of knob '{knob.name()}' from node '{source_node.name()}' to node '{node_name}':\n{e}")
+    return copied_count
+
+
+def update_all_selected():
     global _copying
     if _copying:
         logger.debug("Already copying parameters; ignoring additional trigger.")
@@ -126,66 +171,54 @@ def copy_parameters():
 
     lmb = _tracker.test_validity()
     enter = bool(ctypes.windll.user32.GetAsyncKeyState(0x0D) & 0x8000)
-    if lmb or enter:
-        RETURN = False
+    if not (lmb or enter):
+        return
 
-        node = nuke.thisNode()
-        knob = nuke.thisKnob()
-        if not node or not knob:
-            RETURN = True
-            logger.warning("No node or knob found in context; cannot copy parameters.")
-        if knob.name() in IGNORED_KNOBS:
-            RETURN = True
-            logger.debug(f"Ignoring knob '{knob.name()}' as it's in the ignored list.")
-        # File_Knob on Read nodes reports isAnimated() == True because the filename
-        # pattern (e.g. file.%04d.exr) is frame-dependent, so we exempt File_Knob.
-        if hasattr(knob, 'isAnimated') and knob.isAnimated():
-            if not isinstance(knob, nuke.File_Knob):
-                RETURN = True
-                logger.debug(f"Ignoring knob '{knob.name()}' as it is animated.")
-        if hasattr(knob, 'isReadOnly') and knob.isReadOnly():
-            RETURN = True
-            logger.debug(f"Ignoring knob '{knob.name()}' as it is read-only.")
-        
-        logger.debug(f"Alt+{'Enter' if enter else 'LMB'} on '{knob.name()}' of node '{node.name()}'")
+    node = nuke.thisNode()
+    knob = nuke.thisKnob()
+    if not node or not knob:
+        logger.warning("No node or knob found in context; cannot copy parameters.")
+        return
 
-        if RETURN:
-            return
+    logger.debug(f"Alt+{'Enter' if enter else 'LMB'} on '{knob.name()}' of node '{node.name()}'")
 
-        value = knob.getValue()
+    if not _is_knob_copyable(knob, check_animated=True):
+        return
 
-        _copying = True
-        try:
-            node_ids = nuke.tcl('selected_nodes').split()
-            for node_id in node_ids:
-                node_name = nuke.tcl(f'knob {node_id}.name')
-                if node_name == node.name():
-                    continue
+    _copying = True
+    try:
+        _apply_knob_to_selected(node, knob, knob.getValue())
+    finally:
+        _copying = False
 
-                try:
-                    float(value)
-                    is_numeric = True
-                except Exception as e:
-                    is_numeric = False
 
-                # logger.debug(f"Value '{value}' of knob '{knob.name()}' is {'numeric' if is_numeric else 'non-numeric'}")
+def copy_to_selected():
+    """Copy the value of the right-clicked knob to the same knob on all other selected nodes."""
+    global _copying
+    if _copying:
+        return
 
-                try:
-                    if is_numeric:
-                        nuke.tcl(f'knob {node_id}.{knob.name()} {value}')
-                    else:
-                        nuke.tcl(f'knob {node_id}.{knob.name()} "{value}"')
+    node = nuke.thisNode()
+    knob = nuke.thisKnob()
+    if not node or not knob:
+        logger.warning("No node or knob found in context; cannot copy parameters.")
+        return
 
-                    logger.info(f"Copied value '{value}' of knob '{knob.name()}' from node '{node.name()}' to node '{node_name}'")
+    if not _is_knob_copyable(knob):
+        return
 
-                except Exception as e:
-                    logger.warning(f"Could not copy value '{value}' of knob '{knob.name()}' from node '{node.name()}' to node '{node_name}':\n{e}")
-        finally:
-            _copying = False
+    _copying = True
+    try:
+        copied_count = _apply_knob_to_selected(node, knob, knob.getValue())
+        if copied_count == 0:
+            logger.info(f"No other selected nodes to copy '{knob.name()}' to.")
+    finally:
+        _copying = False
+
 
 def knob_changed():
     modifiers = QApplication.keyboardModifiers()
     # logger.debug(f"Modifiers: {modifiers}")
 
     if modifiers & Qt.AltModifier:
-        copy_parameters()
+        update_all_selected()
